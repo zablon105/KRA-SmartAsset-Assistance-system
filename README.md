@@ -113,6 +113,58 @@ Change these passwords before any public deployment.
 
 ---
 
+## Test Suite (recommended)
+
+This project benefits from a layered test strategy:
+
+- Unit tests (backend): use Django's test runner or `pytest` with `pytest-django` for fast, expressive tests.
+	- Run Django tests:
+		```bash
+		cd backend
+		python manage.py test
+		```
+	- Or with pytest:
+		```bash
+		cd backend
+		pip install pytest pytest-django
+		pytest
+		```
+
+- Linters / formatters (backend): `black`, `isort`, `flake8`.
+	- Example:
+		```bash
+		pip install black isort flake8
+		black .
+		isort .
+		flake8
+		```
+
+- Unit tests (frontend): use `vitest` (fast, minimal config) or `jest`.
+	- Example (Vitest):
+		```bash
+		cd frontend
+		npm install
+		npm run test:unit   # configure script to run vitest
+		```
+
+- E2E tests: use Playwright or Cypress for browser-level flows (login, password reset, clearance workflow).
+	- Playwright example:
+		```bash
+		cd frontend
+		npx playwright install
+		npx playwright test
+		```
+
+- Coverage and CI: generate coverage reports and run tests in CI (GitHub Actions). Example matrix:
+	- jobs:
+		- backend: install Python deps, run `pytest --cov=yourapp`
+		- frontend: install node deps, run `npm run test` and `npm run build`
+		- e2e: start services and run Playwright/Cypress
+
+Maintaining tests and linters helps keep regressions out and speeds up safe deployments.
+
+---
+
 ## Deployment notes
 
 - Use a production-ready database (Postgres) and configure `DATABASE_URL`.
