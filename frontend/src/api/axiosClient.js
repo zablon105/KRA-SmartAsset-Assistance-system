@@ -13,4 +13,25 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle authentication errors globally
+axiosClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // If we get a 401 Unauthorized response, clear auth data and redirect to login
+    if (error.response?.status === 401) {
+      console.warn("[Security] Unauthorized access - clearing auth and redirecting to login");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("kra_user_role");
+      localStorage.removeItem("kra_user_name");
+      
+      // Redirect to login (if not already there)
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default axiosClient;

@@ -21,21 +21,10 @@ export default function Login() {
       const userData = await login(username, password);
       navigate(roleHome[userData?.role] || "/employee");
     } catch {
-      let inferredRole = "employee";
-      const u = username.toLowerCase();
-      if (u.includes("admin")) inferredRole = "admin";
-      else if (u.includes("officer")) inferredRole = "officer";
-
-      loginAsRole(inferredRole, username);
-      navigate(roleHome[inferredRole]);
+      // Login failed; error state is handled by AuthContext.
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleQuickDemoLogin = (role) => {
-    loginAsRole(role);
-    navigate(roleHome[role] || "/employee");
   };
 
   return (
@@ -91,38 +80,6 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Quick Dashboard URL Switcher Card */}
-          <div className="relative z-10 bg-slate-950/80 backdrop-blur-md rounded-xl p-4 border border-slate-800">
-            <span className="text-[10px] uppercase tracking-wider text-amber-300 font-bold block mb-2">
-              Direct Dashboard Access URLs:
-            </span>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                onClick={() => handleQuickDemoLogin("officer")}
-                className="p-2 rounded-lg bg-red-700/80 hover:bg-red-600 text-white text-[11px] font-bold flex flex-col items-center gap-1 border border-red-500/40"
-              >
-                <LayoutGrid size={14} className="text-amber-300" />
-                <span>ICT Officer</span>
-                <span className="text-[9px] font-mono text-red-200 font-normal">/officer</span>
-              </button>
-              <button
-                onClick={() => handleQuickDemoLogin("employee")}
-                className="p-2 rounded-lg bg-red-700/80 hover:bg-red-600 text-white text-[11px] font-bold flex flex-col items-center gap-1 border border-red-500/40"
-              >
-                <HardDrive size={14} className="text-amber-300" />
-                <span>Employee</span>
-                <span className="text-[9px] font-mono text-red-200 font-normal">/employee</span>
-              </button>
-              <button
-                onClick={() => handleQuickDemoLogin("admin")}
-                className="p-2 rounded-lg bg-red-700/80 hover:bg-red-600 text-white text-[11px] font-bold flex flex-col items-center gap-1 border border-red-500/40"
-              >
-                <Shield size={14} className="text-amber-300" />
-                <span>Admin</span>
-                <span className="text-[9px] font-mono text-red-200 font-normal">/admin</span>
-              </button>
-            </div>
-          </div>
 
           {/* Bottom Curved Gold Stripe */}
           <div className="absolute bottom-0 left-0 right-0 h-2 bg-amber-400"></div>

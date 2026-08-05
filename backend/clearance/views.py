@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
@@ -60,8 +61,12 @@ class ClearanceRequestViewSet(viewsets.ModelViewSet):
         clearance = services.reject_clearance(clearance, performed_by=request.user, notes=notes)
         return Response(ClearanceRequestSerializer(clearance).data)
 
-    @action(detail=False, methods=["get"], permission_classes=[])
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def verify_certificate(self, request):
+        """
+        Verify certificate authenticity. Requires authentication.
+        (Can be made public with rate limiting if external verification is needed)
+        """
         cert_id = request.query_params.get("cert_id") or request.query_params.get("certificate_id")
         if not cert_id:
             return Response({"valid": False, "message": "Please provide a valid certificate ID."}, status=400)

@@ -11,38 +11,41 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const savedRole = localStorage.getItem("kra_user_role");
-    const savedName = localStorage.getItem("kra_user_name");
+  // Validate token and sync user state
+  const validateAuth = async () => {
     const token = localStorage.getItem("access_token");
 
-    if (savedRole) {
-      setUser({
-        username: savedName || (savedRole === "admin" ? "System Admin" : savedRole === "officer" ? "James Mwangi" : "John Kamau"),
-        first_name: savedRole === "admin" ? "System" : savedRole === "officer" ? "James" : "John",
-        last_name: savedRole === "admin" ? "Admin" : savedRole === "officer" ? "Mwangi" : "Kamau",
-        role: savedRole,
-      });
+    if (!token) {
+      setUser(null);
       setLoading(false);
-      return;
+      return false;
     }
 
-    if (!token) {
+    try {
+      const res = await fetchMe();
+      setUser(res.data);
+      if (res.data?.role) localStorage.setItem("kra_user_role", res.data.role);
+      if (res.data?.username) localStorage.setItem("kra_user_name", res.data.username);
       setLoading(false);
-      return;
+      return true;
+    } catch (err) {
+      console.error("[Auth] Token validation failed:", err);
+      clearAuthData();
+      setLoading(false);
+      return false;
     }
-    fetchMe()
-      .then((res) => {
-        setUser(res.data);
-        if (res.data?.role) localStorage.setItem("kra_user_role", res.data.role);
-      })
-      .catch(() => {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("kra_user_role");
-        localStorage.removeItem("kra_user_name");
-      })
-      .finally(() => setLoading(false));
+  };
+
+  const clearAuthData = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("kra_user_role");
+    localStorage.removeItem("kra_user_name");
+    setUser(null);
+  };
+
+  useEffect(() => {
+    validateAuth();
   }, []);
 
   const loginAsRole = (role, customUsername) => {
@@ -79,27 +82,22 @@ export function AuthProvider({ children }) {
       setUser(userData);
       return userData;
     } catch (err) {
-      // Fallback demo authentication when backend server is offline
-      let inferredRole = "employee";
-      const u = username.toLowerCase();
-      if (u.includes("admin")) inferredRole = "admin";
-      else if (u.includes("officer")) inferredRole = "officer";
-
-      const demoUser = loginAsRole(inferredRole, username);
-      return demoUser;
+      setError("Login failed. Please check your credentials and try again.");
+      clearAuthData();
+      throw err;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("kra_user_role");
-    localStorage.removeItem("kra_user_name");
-    setUser(null);
+    clearAuthData();
+  };
+
+  const isAuthenticated = () => {
+    return !!user && !!localStorage.getItem("access_token");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, loginAsRole, logout, loading, error }}>
+    <AuthContext.Provider value={{ user, login, loginAsRole, logout, loading, error, isAuthenticated, validateAuth }}>
       {children}
     </AuthContext.Provider>
   );
