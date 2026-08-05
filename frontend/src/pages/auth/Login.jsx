@@ -27,6 +27,12 @@ export default function Login() {
     }
   };
 
+  // Demo mode for development/testing - bypass backend authentication
+  const handleQuickDemoLogin = (role) => {
+    loginAsRole(role);
+    navigate(roleHome[role] || "/employee");
+  };
+
   return (
     <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100">
       {/* Top Header Bar */}
@@ -181,24 +187,37 @@ export default function Login() {
                   <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
                 </div>
                 <span className="relative bg-white dark:bg-slate-900 px-3 text-[10px] uppercase font-bold text-slate-400">
-                  OR
+                  Test Demo Accounts
                 </span>
               </div>
 
-              {/* Google SSO Button */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin("officer")}
-                className="w-full py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-lg hover:bg-slate-50 dark:hover:bg-slate-750 transition-all flex items-center justify-center gap-2.5 shadow-2xs"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.13C3.25 21.3 7.31 24 12 24z"/>
-                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.6H1.27C.46 8.22 0 10.06 0 12s.46 3.78 1.27 5.4l4.01-3.13z"/>
-                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.6l4.01 3.13c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                </svg>
-                Sign in with Google
-              </button>
+              {/* Demo Login Buttons */}
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("admin")}
+                  className="py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-lg transition-all flex flex-col items-center gap-1"
+                >
+                  <Shield size={14} />
+                  <span>Admin</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("officer")}
+                  className="py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg transition-all flex flex-col items-center gap-1"
+                >
+                  <LayoutGrid size={14} />
+                  <span>Officer</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("employee")}
+                  className="py-2 bg-green-600 hover:bg-green-700 text-white font-bold text-xs rounded-lg transition-all flex flex-col items-center gap-1"
+                >
+                  <HardDrive size={14} />
+                  <span>Employee</span>
+                </button>
+              </div>
             </form>
 
             <div className="mt-6 text-center text-[11px] text-slate-500 flex items-center justify-center gap-1.5 font-medium">
