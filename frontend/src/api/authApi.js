@@ -1,7 +1,7 @@
 import axiosClient from "./axiosClient";
 
-export const loginRequest = (username, password) =>
-  axiosClient.post("/token/", { username, password });
+export const loginRequest = (identifier, password) =>
+  axiosClient.post("/token/", { identifier, password });
 
 export const fetchMe = () => axiosClient.get("/me/");
 
