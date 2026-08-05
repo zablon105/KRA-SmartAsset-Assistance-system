@@ -107,11 +107,14 @@ class TokenObtainPairByUsernameOrEmailView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        identifier = request.data.get('username') or request.data.get('email')
+        identifier = request.data.get('username') or request.data.get('email') or request.data.get('identifier')
         password = request.data.get('password')
 
         if not identifier or not password:
             return Response({'detail': 'Must include username/email and password.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Normalize identifier
+        identifier = identifier.strip()
 
         # Try authenticate directly (username)
         user = authenticate(request, username=identifier, password=password)
