@@ -10,6 +10,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from accounts.permissions import IsICTOfficerOrAdmin
 from .serializers import PasswordResetConfirmSerializer, PasswordResetRequestSerializer, UserSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from rest_framework import status
 
 User = get_user_model()
 
@@ -93,3 +96,34 @@ class PasswordResetConfirmView(APIView):
         user.set_password(data["new_password"])
         user.save()
         return Response({"detail": "Password has been reset successfully."})
+
+
+class TokenObtainPairByUsernameOrEmailView(APIView):
+    """POST /api/token/ — accept username OR email plus password and return JWT tokens.
+
+    This replaces the default SimpleJWT TokenObtainPairView so clients can submit
+    an identifier (username or email) in the `username` field.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        identifier = request.data.get('username') or request.data.get('email')
+        password = request.data.get('password')
+
+        if not identifier or not password:
+            return Response({'detail': 'Must include username/email and password.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Try authenticate directly (username)
+        user = authenticate(request, username=identifier, password=password)
+
+        # If not found, try resolving identifier as email
+        if user is None:
+            user_obj = User.objects.filter(email__iexact=identifier).first()
+            if user_obj:
+                user = authenticate(request, username=user_obj.username, password=password)
+
+        if user is None:
+            return Response({'detail': 'No active account found with the given credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        refresh = RefreshToken.for_user(user)
+        return Response({'access': str(refresh.access_token), 'refresh': str(refresh)})
