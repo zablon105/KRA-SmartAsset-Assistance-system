@@ -468,7 +468,7 @@ export default function AdminDashboard() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Samuel Maina"
+                  aria-label="Full name or username"
                   value={newUserData.username}
                   onChange={(e) => setNewUserData({ ...newUserData, username: e.target.value })}
                   className="w-full text-xs p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
@@ -482,7 +482,7 @@ export default function AdminDashboard() {
                 </label>
                 <input
                   type="email"
-                  placeholder="e.g. smaina@kra.go.ke"
+                  aria-label="Email address"
                   value={newUserData.email}
                   onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
                   className="w-full text-xs p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
@@ -512,7 +512,7 @@ export default function AdminDashboard() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Domestic Taxes"
+                    aria-label="Department"
                     value={newUserData.department}
                     onChange={(e) => setNewUserData({ ...newUserData, department: e.target.value })}
                     className="w-full text-xs p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
@@ -558,7 +558,7 @@ export default function AdminDashboard() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Regional Asset Supervisor"
+                  aria-label="Role title"
                   value={newRoleData.name}
                   onChange={(e) => setNewRoleData({ ...newRoleData, name: e.target.value })}
                   className="w-full text-xs p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
@@ -572,7 +572,7 @@ export default function AdminDashboard() {
                 </label>
                 <textarea
                   rows="2"
-                  placeholder="Describe scope of authority..."
+                  aria-label="Role description"
                   value={newRoleData.description}
                   onChange={(e) => setNewRoleData({ ...newRoleData, description: e.target.value })}
                   className="w-full text-xs p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"

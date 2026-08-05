@@ -465,9 +465,9 @@ export default function EmployeeDashboard() {
                 </label>
                 <textarea
                   rows="3"
+                  aria-label="Describe issue"
                   value={problemDescription}
                   onChange={(e) => setProblemDescription(e.target.value)}
-                  placeholder="Describe the issue in detail..."
                   className="w-full text-xs p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                   required
                 ></textarea>
