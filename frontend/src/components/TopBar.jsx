@@ -14,20 +14,21 @@ export default function TopBar({ title, subtitle }) {
   let badgeCount = 6;
   let defaultName = "James Mwangi";
   let defaultTitle = "ICT Officer";
-  let avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120";
+  const userAvatar = user?.profile_image?.trim();
+  let avatarUrl = userAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120";
 
   if (path.startsWith("/admin") || user?.role === "admin") {
     searchPlaceholder = "Search users, logs, settings...";
     badgeCount = 4;
     defaultName = "System Admin";
     defaultTitle = "Administrator";
-    avatarUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120";
+    avatarUrl = userAvatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120";
   } else if (path.startsWith("/employee") || path === "/" || user?.role === "employee") {
     searchPlaceholder = "Search anything...";
     badgeCount = 5;
     defaultName = "John Kamau";
     defaultTitle = "Tax Officer";
-    avatarUrl = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120";
+    avatarUrl = userAvatar || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120";
   }
 
   const displayName = user?.first_name ? `${user.first_name} ${user.last_name}` : (user?.username || defaultName);

@@ -6,13 +6,17 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const name = user?.first_name ? `${user.first_name} ${user.last_name}` : (user?.username || "James Mwangi");
   const role = user?.role ? (user.role === "admin" ? "System Administrator" : user.role === "officer" ? "ICT Officer" : "Tax Officer") : "ICT Officer";
+  const profileImage = user?.profile_image || "";
+  const avatarSrc = profileImage.startsWith("data:") || profileImage.startsWith("http")
+    ? profileImage
+    : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=160";
 
   return (
     <Layout title="User Profile" subtitle="Account credentials, designation details, and station assignments">
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-xs max-w-2xl">
         <div className="flex items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-6 mb-6">
           <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=160"
+            src={avatarSrc}
             alt="Profile Avatar"
             className="w-16 h-16 rounded-full object-cover border-4 border-emerald-600/20 shadow-md"
           />

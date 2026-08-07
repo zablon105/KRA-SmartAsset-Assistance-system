@@ -4,12 +4,18 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from accounts.permissions import IsICTOfficerOrAdmin
-from .serializers import PasswordResetConfirmSerializer, PasswordResetRequestSerializer, UserSerializer
+from accounts.permissions import IsICTAdmin, IsICTOfficerOrAdmin
+from .models import RolePermission
+from .serializers import (
+    PasswordResetConfirmSerializer,
+    PasswordResetRequestSerializer,
+    RolePermissionSerializer,
+    UserSerializer,
+)
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework import status
@@ -17,8 +23,9 @@ from rest_framework import status
 User = get_user_model()
 
 
-class MeView(RetrieveAPIView):
-    """GET /api/me/ — returns the currently authenticated user's profile."""
+class MeView(RetrieveUpdateAPIView):
+    """GET /api/me/ — returns the currently authenticated user's profile.
+    PATCH /api/me/ — update the authenticated user's own profile."""
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
@@ -34,6 +41,30 @@ class UserListView(ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsICTOfficerOrAdmin]
     queryset = User.objects.all().order_by("username")
+
+
+class RolePermissionListView(ListAPIView):
+    """GET /api/users/permissions/ — list all role permission entries."""
+    serializer_class = RolePermissionSerializer
+    permission_classes = [IsICTOfficerOrAdmin]
+
+    def get_queryset(self):
+        defaults = [
+            {"role": RolePermission.Role.ADMIN, "permissions": "Full Access to All Modules, System Config & Security"},
+            {"role": RolePermission.Role.OFFICER, "permissions": "Asset Lifecycle Management, Clearances, Repairs & QR Scans"},
+            {"role": RolePermission.Role.EMPLOYEE, "permissions": "View Assigned Assets, Request Clearance, Submit Tickets"},
+            {"role": RolePermission.Role.AUDITOR, "permissions": "Read-only access to Audit Logs, Reports & Assets"},
+        ]
+        for default in defaults:
+            RolePermission.objects.get_or_create(role=default["role"], defaults={"permissions": default["permissions"]})
+        return RolePermission.objects.all().order_by("role")
+
+
+class UserRolePermissionDetailView(RetrieveUpdateAPIView):
+    """GET/PATCH /api/users/<pk>/permissions/ — view or update a role permission entry."""
+    serializer_class = RolePermissionSerializer
+    permission_classes = [IsICTAdmin]
+    queryset = RolePermission.objects.all()
 
 
 # --- Password reset (email delivered via Resend, see settings.EMAIL_BACKEND) ---

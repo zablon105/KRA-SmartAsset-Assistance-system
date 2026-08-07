@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { 
   User, Shield, Sliders, Activity, Mail, FileText, 
-  MapPin, Camera, CheckCircle
-} from "lucide-react";
+  MapPin, Camera, CheckCircle, UploadCloud, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import Layout from "../../components/Layout";
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, updateProfileData } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   
   const [fullName, setFullName] = useState("Alexander Hamilton");
   const [email, setEmail] = useState("ahamilton@ict.gov.internal");
   const [employeeId, setEmployeeId] = useState("ICT-99821-ADM");
   const [department, setDepartment] = useState("Information Infrastructure & Security");
+  const [profileImage, setProfileImage] = useState("");
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -21,15 +21,45 @@ export default function SettingsPage() {
       setFullName(user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username);
       setEmail(user.email || "ahamilton@ict.gov.internal");
       setEmployeeId(user.username === "ahamilton" ? "ICT-99821-ADM" : `ICT-99821-00${user.id}`);
-      setDepartment(user.station || "Information Infrastructure & Security");
+      setDepartment(user.department || user.station || "Information Infrastructure & Security");
+      setProfileImage(user.profile_image || "");
     }
   }, [user]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setProfileImage(reader.result || "");
+    };
+    reader.readAsDataURL(file);
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const [first_name, ...rest] = fullName.trim().split(" ");
+    const last_name = rest.join(" ");
+
+    try {
+      await updateProfileData({
+        first_name,
+        last_name,
+        email,
+        department,
+        profile_image: profileImage,
+      });
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      console.error("Profile save failed", err);
+    }
+  };
+
+  const profileAvatar = profileImage.startsWith("data:") || profileImage.startsWith("http")
+    ? profileImage
+    : null;
 
   return (
     <Layout title="Account Settings" subtitle="Manage your administrative profile and security preferences.">
@@ -99,13 +129,28 @@ export default function SettingsPage() {
               <div className="flex flex-col md:flex-row gap-6 items-center border-b border-gray-100 dark:border-neutral-850 pb-6">
                 {/* Photo frame with edit badge */}
                 <div className="relative">
+                {profileAvatar ? (
+                  <img
+                    src={profileAvatar}
+                    alt="Profile"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-primary/20"
+                  />
+                ) : (
                   <div className="w-20 h-20 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-2xl uppercase border-2 border-primary/20">
                     {fullName.substring(0, 1).toUpperCase()}
                   </div>
-                  <button className="absolute bottom-0 right-0 p-1.5 rounded-full bg-primary hover:bg-primary-light text-white shadow-md border border-white transition-colors">
-                    <Camera size={12} />
-                  </button>
-                </div>
+                )}
+                <label htmlFor="profile-image-upload" className="absolute bottom-0 right-0 p-2 rounded-full bg-primary hover:bg-primary-light text-white shadow-md border border-white transition-colors cursor-pointer">
+                  <UploadCloud size={14} />
+                  <input
+                    id="profile-image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
 
                 <div className="text-center md:text-left">
                   <h3 className="text-base font-extrabold dark:text-white">System Administrator</h3>
@@ -171,6 +216,9 @@ export default function SettingsPage() {
                       required
                     />
                   </div>
+                </div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                  Upload a profile picture to personalize your account. Accepted formats: PNG, JPG, JPEG.
                 </div>
 
                 <div className="pt-4">

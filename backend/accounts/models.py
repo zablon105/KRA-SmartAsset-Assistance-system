@@ -20,6 +20,21 @@ class User(AbstractUser):
     )
     station = models.CharField(max_length=100, blank=True)
     department = models.CharField(max_length=100, blank=True, default="ICT Department")
+    profile_image = models.TextField(blank=True, default="")
 
     def __str__(self):
         return f"{self.username} ({self.role})"
+
+
+class RolePermission(models.Model):
+    class Role(models.TextChoices):
+        ADMIN = "admin", "System Administrator"
+        OFFICER = "officer", "ICT Officer"
+        EMPLOYEE = "employee", "Tax / Customs Employee"
+        AUDITOR = "auditor", "Auditor / Compliance"
+
+    role = models.CharField(max_length=30, choices=Role.choices, unique=True)
+    permissions = models.TextField(blank=True, default="")
+
+    def __str__(self):
+        return f"{self.get_role_display()} permissions"

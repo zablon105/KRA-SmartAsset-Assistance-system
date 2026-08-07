@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { loginRequest, fetchMe } from "../api/authApi";
+import { loginRequest, fetchMe, updateProfile } from "../api/authApi";
 
 const AuthContext = createContext(null);
 
@@ -88,6 +88,24 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const updateProfileData = async (data) => {
+    setError(null);
+    try {
+      const { data: updatedUser } = await updateProfile(data);
+      setUser((prev) => ({ ...prev, ...updatedUser }));
+      if (updatedUser?.role) {
+        localStorage.setItem("kra_user_role", updatedUser.role);
+      }
+      if (updatedUser?.username) {
+        localStorage.setItem("kra_user_name", updatedUser.username);
+      }
+      return updatedUser;
+    } catch (err) {
+      setError("Unable to save profile changes.");
+      throw err;
+    }
+  };
+
   const logout = () => {
     clearAuthData();
   };
@@ -97,7 +115,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, loginAsRole, logout, loading, error, isAuthenticated, validateAuth }}>
+    <AuthContext.Provider value={{ user, login, loginAsRole, logout, updateProfileData, loading, error, isAuthenticated, validateAuth }}>
       {children}
     </AuthContext.Provider>
   );
