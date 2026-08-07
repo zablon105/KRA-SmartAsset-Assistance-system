@@ -60,12 +60,12 @@ export default function OfficerDashboard() {
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
           <span className="font-bold">ICT Officer Portal Active:</span>
-          <span className="font-mono text-red-100 font-medium">http://localhost:5173/officer</span>
+          <span className="font-mono text-red-100 font-medium">https://kra-smart-asset-assistance-system-q.vercel.app/officer</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-red-200 text-[11px]">Login Portal URL:</span>
           <Link to="/login" className="font-mono text-amber-300 hover:underline font-bold">
-            http://localhost:5173/login
+            https://kra-smart-asset-assistance-system-q.vercel.app/login
           </Link>
         </div>
       </div>
